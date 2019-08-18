@@ -1,6 +1,8 @@
 # pomodoro.c
 *A small pomodoro timer written in C*
 
+![screenshot](screenshot.png)
+
 A very simple pomodoro timer which requires no dependencies. Must be ran as root in order to get sound, as the internal PC speaker is used for the alarm.
 
 ## Requirements 
