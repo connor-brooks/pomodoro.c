@@ -16,7 +16,7 @@ If you require sound:
 
 `sudo chown root:root ./pomodoro`
 
-`sudo chmod 4755./pomodoro`
+`sudo chmod 4755. /pomodoro`
 
 If the `pcspkr` kernel module isn't already loaded:
 
