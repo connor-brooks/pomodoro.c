@@ -69,7 +69,7 @@ int main()
     draw(mode_labels[cur_mode], GREY, mode_durs[cur_mode]);
 
     do {
-      sleep(1);
+      sleep(60);
       cur_min++;
       draw(mode_labels[cur_mode], COLOR, cur_min);
     } while(cur_min < mode_durs[cur_mode]);
