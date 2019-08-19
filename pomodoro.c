@@ -34,15 +34,14 @@ tone(int fd, int freq, int dur)
 void
 chime(int fd, int* pattern, int tone_dur)
 {
-  for(int i = 0; i < 3; i++) 
+  for(int i = 0; i < 3; i++)
     tone(fd, pattern[i], tone_dur);
 }
 
 void
 label(char* text)
 {
-  printf("\r\033[0m");
-  printf("%s\t", text);
+  printf("\r\033[0m%s\t", text);
 }
 
 void
@@ -54,28 +53,32 @@ draw(char* text, int color, int count)
 
 int main()
 {
-  int mode_durs[2] = {25, 5};
-  char* mode_labels[2] =  {"\e[1mWork\e[0m", "Break"};
-  int times_chimes[2][3] = {{1000, 1500, 3000}, {3000, 1500, 1000}};
-  int tone_dur = 50;
+  int mode_durs[3] = {25, 5, 15};
+  char* mode_labels[3] =  {"\e[1mWork\e[0m", "Break", "Break"};
+  int times_chimes[3][3] = {{1000, 1500, 3000}, 
+                            {3000, 1500, 1000},
+                            {1500, 700,  500}};
+  int mode_seqs[8] = {0, 1, 0, 1, 0, 1, 0, 2};
+  int tone_dur = 60;
   int cur_mode = 0;
+  int cur_seq = 0;
   int cur_min = 0;
   int fd = open("/dev/console", O_WRONLY);
 
-  draw(mode_labels[cur_mode], GREY, mode_durs[cur_mode]);
+  while(1) {
+    draw(mode_labels[cur_mode], GREY, mode_durs[cur_mode]);
 
-    while(1) {
-      draw(mode_labels[cur_mode], COLOR, cur_min);
-
-      if(cur_min == mode_durs[cur_mode]) {
-        cur_mode = (cur_mode)? 0 : 1;
-        cur_min = 0;
-        chime(fd, times_chimes[cur_mode], tone_dur);
-        printf("\n");
-        draw(mode_labels[cur_mode], GREY, mode_durs[cur_mode]);
-      }
-      sleep(60);
+    do {
+      sleep(1);
       cur_min++;
-    }
+      draw(mode_labels[cur_mode], COLOR, cur_min);
+    } while(cur_min < mode_durs[cur_mode]);
+
+    cur_seq = (cur_seq + 1) % 8;
+    cur_mode = mode_seqs[cur_seq];
+    cur_min = 0;
+    chime(fd, times_chimes[cur_mode], tone_dur);
+    printf("\n");
+  }
   close(fd);
 }
