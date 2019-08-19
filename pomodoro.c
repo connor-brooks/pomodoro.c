@@ -4,6 +4,8 @@
 #include <linux/kd.h>
 #include <sys/ioctl.h>
 
+enum draw_mode{GREY, COLOR};
+
 void
 tomato(int color)
 {
@@ -30,11 +32,10 @@ tone(int fd, int freq, int dur)
 }
 
 void
-chime(int fd, int freq, int dur)
+chime(int fd, int* pattern, int tone_dur)
 {
-  tone(fd, freq, dur);
-  tone(fd, freq * 1.5, dur);
-  tone(fd, freq * 2, dur);
+  for(int i = 0; i < 3; i++) 
+    tone(fd, pattern[i], tone_dur);
 }
 
 void
@@ -53,25 +54,25 @@ draw(char* text, int color, int count)
 
 int main()
 {
-  int times[2] = {25, 5};
-  char* times_label[2] =  {"\e[1mWork\e[0m", "Break"};
-  int timer_mode = 0;
+  int mode_durs[2] = {25, 5};
+  char* mode_labels[2] =  {"\e[1mWork\e[0m", "Break"};
+  int times_chimes[2][3] = {{1000, 1500, 3000}, {3000, 1500, 1000}};
+  int tone_dur = 50;
+  int cur_mode = 0;
   int cur_min = 0;
-  int freq = 1000;
-  int len = 50;
   int fd = open("/dev/console", O_WRONLY);
 
-  draw(times_label[timer_mode], 0, times[timer_mode]);
+  draw(mode_labels[cur_mode], GREY, mode_durs[cur_mode]);
 
     while(1) {
-      draw(times_label[timer_mode], 1, cur_min);
+      draw(mode_labels[cur_mode], COLOR, cur_min);
 
-      if(cur_min == times[timer_mode]) {
-        timer_mode = (timer_mode)? 0 : 1;
+      if(cur_min == mode_durs[cur_mode]) {
+        cur_mode = (cur_mode)? 0 : 1;
         cur_min = 0;
-        chime(fd, freq, len);
+        chime(fd, times_chimes[cur_mode], tone_dur);
         printf("\n");
-        draw(times_label[timer_mode], 0, times[timer_mode]);
+        draw(mode_labels[cur_mode], GREY, mode_durs[cur_mode]);
       }
       sleep(60);
       cur_min++;
