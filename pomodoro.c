@@ -10,7 +10,7 @@ void
 tomato(int color)
 {
   if(color)
-    printf("\033[0;32m>\033[0;31m@ ");
+    printf("\033[1;32m>\033[0;31m@ ");
   else
     printf("\033[1;30m>@ ");
 }
